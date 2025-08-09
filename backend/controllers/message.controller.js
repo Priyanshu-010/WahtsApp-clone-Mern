@@ -38,12 +38,37 @@ export const sendMessage = async (req, res) => {
       global.io.emit('new-message', newMsg);
     }
 
+    // Simulate delivered after 2s
+    setTimeout(async () => {
+      const updated = await Message.findByIdAndUpdate(
+        newMsg._id,
+        { status: 'delivered' },
+        { new: true }
+      );
+      if (global.io) {
+        global.io.emit('message-status-update', updated);
+      }
+    }, 2000);
+
+    // Simulate read after 4s
+    setTimeout(async () => {
+      const updated = await Message.findByIdAndUpdate(
+        newMsg._id,
+        { status: 'read' },
+        { new: true }
+      );
+      if (global.io) {
+        global.io.emit('message-status-update', updated);
+      }
+    }, 4000);
+
     res.json(newMsg);
   } catch (error) {
     console.error("Error in sendMessage:", error);
     res.status(500).json({ error: 'Failed to send message' });
   }
 };
+
 
 
 
