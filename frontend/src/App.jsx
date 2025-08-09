@@ -1,12 +1,10 @@
 import { Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import Chat from './pages/Chat';
+import Layout from './pages/Layout';
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/chat/:wa_id" element={<Chat />} />
+      <Route path="/" element={<Layout />} />
     </Routes>
   );
 }
