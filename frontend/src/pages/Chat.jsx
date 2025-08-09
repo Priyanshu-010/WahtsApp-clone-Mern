@@ -1,36 +1,39 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import axios from 'axios';
-import io from 'socket.io-client';
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import io from "socket.io-client";
 
-const socket = io('http://localhost:3000');
+const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
 
 export default function Chat() {
   const { wa_id } = useParams();
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
+  const [input, setInput] = useState("");
+
+  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
   useEffect(() => {
-    axios.get(`http://localhost:3000/api/messages/${wa_id}`)
-      .then(res => setMessages(res.data));
+    axios
+      .get(`${API_BASE || "http://localhost:3000"}/api/messages/${wa_id}`)
+      .then((res) => setMessages(res.data));
 
-    socket.on('new-message', msg => {
+    socket.on("new-message", (msg) => {
       if (msg.wa_id === wa_id) {
-        setMessages(prev => [...prev, msg]);
+        setMessages((prev) => [...prev, msg]);
       }
     });
 
-    return () => socket.off('new-message');
+    return () => socket.off("new-message");
   }, [wa_id]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
-    const res = await axios.post('http://localhost:3000/api/messages/send', {
+    const res = await axios.post(`${API_BASE || "http://localhost:3000"}/api/messages/send`, {
       wa_id,
       name: "You",
-      text: input
+      text: input,
     });
-    setInput('');
+    setInput("");
   };
 
   return (
@@ -57,7 +60,9 @@ export default function Chat() {
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
-        <button className="btn btn-primary" onClick={handleSend}>Send</button>
+        <button className="btn btn-primary" onClick={handleSend}>
+          Send
+        </button>
       </div>
     </div>
   );

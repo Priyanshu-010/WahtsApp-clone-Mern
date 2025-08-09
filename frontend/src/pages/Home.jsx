@@ -4,9 +4,10 @@ import { Link } from 'react-router-dom';
 
 export default function Home() {
   const [chats, setChats] = useState([]);
+  const API_BASE = import.meta.env.VITE_API_URL;
 
   useEffect(() => {
-    axios.get('http://localhost:3000/api/messages/conversations')
+    axios.get(`${API_BASE || 'http://localhost:3000'}/api/messages/conversations`)
       .then(res => setChats(Object.entries(res.data)))
       .catch(err => console.error(err));
   }, []);
