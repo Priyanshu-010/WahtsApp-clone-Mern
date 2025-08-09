@@ -11,15 +11,45 @@ const processPayloads = async () => {
       const filePath = path.join(payloadDir, file);
       const raw = fs.readFileSync(filePath);
       const payload = JSON.parse(raw);
+      
+      if (payload.payload_type === 'whatsapp_webhook') {
+        const change = payload.metaData.entry?.[0]?.changes?.[0];
+        const value = change?.value;
 
-      // Send to backend API to process and store
-      const res = await axios.post('http://localhost:3000/api/messages/process-payloads', payload);
-      console.log(`✅ Processed ${file}:`, res.data);
+        const contact = value?.contacts?.[0];
+        const message = value?.messages?.[0];
+
+        if (!contact || !message) {
+          console.warn(`Skipped ${file} — no message data found`);
+          continue;
+        }
+
+        const wa_id = contact.wa_id;
+        const name = contact.profile?.name || 'Unknown';
+        const text = message.text?.body || '';
+        const timestamp = new Date(parseInt(message.timestamp) * 1000);
+        const message_id = message.id;
+
+        await axios.post('http://localhost:3000/api/messages/process-payloads', {
+          type: 'message',
+          wa_id,
+          name,
+          text,
+          timestamp,
+          message_id
+        });
+
+        console.log(`Processed message payload: ${file}`);
+        continue;
+      }
+
+      await axios.post('http://localhost:3000/api/messages/process-payloads', payload);
+      console.log(`Processed simple payload: ${file}`);
     }
 
-    console.log("🎉 All payloads processed successfully!");
+    console.log("All payloads processed successfully!");
   } catch (err) {
-    console.error("❌ Error processing payloads:", err.message);
+    console.error(`Error processing payloads:`, err.message);
   }
 };
 
