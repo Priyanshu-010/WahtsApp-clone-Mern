@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
 import io from 'socket.io-client';
+import { CheckIcon, CheckDoubleIcon } from '../utils/StatusIcons';
 
 const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000');
 
@@ -53,9 +54,16 @@ export default function ChatWindow({ wa_id, name, onBack }) {
             <div className="chat-header">{msg.name}</div>
             <div className={`chat-bubble ${msg.name === "You" ? "bg-green-500 text-white" : "bg-gray-200 text-black"}`}>
               {msg.text}
+              {msg.name === "You" && (
+                <span className="ml-2 inline-flex items-center">
+                  {msg.status === 'sent' && <CheckIcon />}
+                  {msg.status === 'delivered' && <CheckDoubleIcon color="gray" />}
+                  {msg.status === 'read' && <CheckDoubleIcon color="blue" />}
+                </span>
+              )}
             </div>
             <div className="chat-footer opacity-50 text-xs">
-              {msg.status} | {new Date(msg.timestamp).toLocaleString()}
+              {new Date(msg.timestamp).toLocaleString()}
             </div>
           </div>
         ))}
