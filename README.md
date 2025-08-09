@@ -1,100 +1,130 @@
-# WhatsApp Web Clone – RapidQuest Full Stack Developer Assignment
+# 💬 WhatsApp Clone – MERN + Socket.IO
 
-This is a **full-stack MERN application** that simulates WhatsApp Web for testing and demonstration purposes.  
-It processes **webhook payloads** (sample JSON files) to display chats, messages, and statuses in a WhatsApp-like interface.  
-Messages can be sent from the UI, saved in MongoDB, and updated in **real-time** via WebSocket (Socket.IO).
+A **real-time messaging platform** built with the **MERN Stack** and **Socket.IO**, designed to replicate the core chat experience of WhatsApp Web.  
+Includes **Webhook Payload Processing**, **Real-Time Updates**, and a **responsive UI** with **Tailwind CSS + DaisyUI**.
+
+---
+
+## 🔗 Live Links
+
+- **Frontend**: [https://wahts-app-clone-mern.vercel.app/](https://wahts-app-clone-mern.vercel.app/)
+- **Backend API**: [https://wahtsapp-clone-mern.onrender.com](https://wahtsapp-clone-mern.onrender.com)
+- **GitHub Repo**: [https://github.com/Priyanshu-010/WahtsApp-clone-Mern](https://github.com/Priyanshu-010/WahtsApp-clone-Mern)
 
 ---
 
 ## 🚀 Features
-- **Webhook Payload Processing** – Reads `.json` files from `/backend/payloads` and stores them in MongoDB
-- **WhatsApp Web–like UI** – Responsive, mobile-friendly, and styled with Tailwind CSS + DaisyUI
-- **Conversations View** – Groups chats by user (`wa_id`) with last message preview
-- **Message View** – Shows all messages in a chat with date, time, and status ticks
-- **Send Message Simulation** – Messages are stored in DB and shown in real-time (no real WhatsApp API calls)
-- **Status Updates** – Sent → Delivered → Read ticks update automatically
-- **Real-Time Interface** – New messages and status changes appear instantly without refreshing
+
+- ⚡ **Real-time chat** with Socket.IO
+- 🔄 **Webhook payload processing** to import messages from `.json` files
+- 📩 Send, receive, and update message status (sent, delivered, read)
+- 📱 Fully **responsive** layout for mobile and desktop
+- 🎨 Styled with **Tailwind CSS** + **DaisyUI** components
+- 🔍 Search chat list by name, number, or message
+- 🖼️ WhatsApp Web–like UI & layout
 
 ---
 
-## 🛠 Tech Stack
-**Frontend:**
-- React 19
-- Vite
-- Tailwind CSS v4.1 + DaisyUI v5
-- Socket.IO Client
-- Axios
-- React Router v7
+## 🖼️ Screenshots
 
-**Backend:**
+### 🗂 Chat List (Desktop)
+![Home Page](./assets/home.png)
+
+![Chat List](./assets/chat-list.png)
+
+### 💬 Chat Window
+![Chat Window](./assets/chat-window.png)
+
+### 📱 Mobile View
+![Mobile View](./assets/mobile-view.png)
+
+---
+
+## 🧰 Tech Stack
+
+### Frontend
+- React (Vite)
+- Tailwind CSS v4.1
+- DaisyUI v5
+- Axios
+- Socket.IO Client
+
+### Backend
 - Node.js
 - Express.js
-- MongoDB (Atlas)
-- Mongoose
+- MongoDB + Mongoose
 - Socket.IO
 - dotenv
+- CORS
 
 ---
 
 ## 📂 Project Structure
 
-Whatsapp-Clone/
+WhatsApp-clone-Mern/
+│
 ├── backend/
-│ ├── server.js
-│ ├── routes/
 │ ├── controllers/
+│ ├── payloads/
+│ ├── processPayloads.js
 │ ├── models/
-│ ├── utils/
-│ ├── payloads/ # JSON webhook files
-│ └── processPayloads.js
+│ ├── routes/
+│ ├── index.js
+│ ├── socket.js
+│ └── .env 
+│
 ├── frontend/
 │ ├── src/
 │ │ ├── pages/
 │ │ ├── utils/
-│ │ ├── App.jsx/
-│ │ ├── index.css
-│ │ └── main.jsx
-│ └── vite.config.js
-
+│ │ ├── App.jsx
+│ │ └── Main.jsx
+│ └── .env 
+│
+└── README.md
 
 ---
 
-## 📦 Installation & Setup
+## 🧪 Run Locally
 
-### 1️⃣ Clone the repository
+### 1️⃣ Clone the Repository
 ```bash
-git clone <repo-url>
-cd whatsapp-clone
+git clone https://github.com/Priyanshu-010/WahtsApp-clone-Mern.git
+cd WahtsApp-clone-Mern
 
 2️⃣ Setup Backend
 
 cd backend
 npm install
 
-Create .env file:
-
+Create a .env file:
 PORT=3000
-MONGO_URI=your-mongodb-atlas-uri
+MONGO_URI=your_mongodb_connection_string
 
 npm run dev
 
 3️⃣ Setup Frontend
 
-cd frontend
+cd ../frontend
 npm install
 
-Create .env file:
-
+Create a .env file:
 VITE_API_URL=http://localhost:3000
 
 npm run dev
 
-📝 Processing Webhook Payloads
-Place sample payload .json files in:
+4️⃣ Processing Payloads (Optional)
+If you have .json files for initial messages:
 
-backend/payloads/
+Place them in /backend/payloads/
 
 Run:
-cd backend
 node processPayloads.js
 
+---
+
+✍️ Author
+Priyanshu Rai
+📧 Email: priyanshurai2772@gmail.com
+🔗 LinkedIn: linkedin.com/in/priyanshuraidev
+💻 GitHub: github.com/Priyanshu-010
