@@ -1,6 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import axios from 'axios';
+import dotenv from 'dotenv';
+dotenv.config();
+
+const API_BASE = process.env.API_BASE;
 
 const processPayloads = async () => {
   try {
@@ -30,7 +34,7 @@ const processPayloads = async () => {
         const timestamp = new Date(parseInt(message.timestamp) * 1000);
         const message_id = message.id;
 
-        await axios.post('http://localhost:3000/api/messages/process-payloads', {
+        await axios.post(`${API_BASE || "http://localhost:3000"}/api/messages/process-payloads`, {
           type: 'message',
           wa_id,
           name,
@@ -43,7 +47,7 @@ const processPayloads = async () => {
         continue;
       }
 
-      await axios.post('http://localhost:3000/api/messages/process-payloads', payload);
+      await axios.post(`${API_BASE || "http://localhost:3000"}/api/messages/process-payloads`, payload);
       console.log(`Processed simple payload: ${file}`);
     }
 
