@@ -1,51 +1,46 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import io from "socket.io-client";
 import { CheckIcon, CheckDoubleIcon } from "../utils/StatusIcons";
 
-const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
-
-export default function ChatWindow({ wa_id, name, onBack }) {
+export default function ChatWindow({ socket, wa_id, name, onBack }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
 
   useEffect(() => {
     axios
-      .get(
-        `${
-          import.meta.env.VITE_API_URL || "http://localhost:3000"
-        }/api/messages/${wa_id}`
-      )
-      .then((res) => setMessages(res.data));
+      .get(`${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/messages/${wa_id}`)
+      .then(res => setMessages(res.data))
+      .catch(err => console.error(err));
 
-    socket.on("new-message", (msg) => {
+    socket.on("new-message", msg => {
       if (msg.wa_id === wa_id) {
-        setMessages((prev) => [...prev, msg]);
+        setMessages(prev => [...prev, msg]);
       }
     });
 
-    socket.on("message-status-update", (updatedMsg) => {
-      setMessages((prev) =>
-        prev.map((m) => (m._id === updatedMsg._id ? updatedMsg : m))
+    socket.on("message-status-update", updatedMsg => {
+      setMessages(prev =>
+        prev.map(m => (m._id === updatedMsg._id ? updatedMsg : m))
       );
     });
 
-    return () => socket.off("new-message");
-  }, [wa_id]);
+    return () => {
+      socket.off("new-message");
+      socket.off("message-status-update");
+    };
+  }, [wa_id, socket]);
 
   const handleSend = async () => {
     if (!input.trim()) return;
-    await axios.post(
-      `${
-        import.meta.env.VITE_API_URL || "http://localhost:3000"
-      }/api/messages/send`,
-      {
-        wa_id,
-        name: "You",
-        text: input,
-      }
-    );
-    setInput("");
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_URL || "http://localhost:3000"}/api/messages/send`,
+        { wa_id, name: "You", text: input }
+      );
+      setInput("");
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -60,9 +55,7 @@ export default function ChatWindow({ wa_id, name, onBack }) {
             ←
           </button>
         )}
-        <div className="font-semibold">
-          {name} ({wa_id})
-        </div>
+        <div className="font-semibold truncate">{name} ({wa_id})</div>
       </div>
 
       {/* Messages */}
@@ -84,9 +77,7 @@ export default function ChatWindow({ wa_id, name, onBack }) {
               {msg.name === "You" && (
                 <span className="ml-2 inline-flex items-center">
                   {msg.status === "sent" && <CheckIcon />}
-                  {msg.status === "delivered" && (
-                    <CheckDoubleIcon color="gray" />
-                  )}
+                  {msg.status === "delivered" && <CheckDoubleIcon color="gray" />}
                   {msg.status === "read" && <CheckDoubleIcon color="blue" />}
                 </span>
               )}
@@ -104,7 +95,8 @@ export default function ChatWindow({ wa_id, name, onBack }) {
           className="input input-bordered w-full"
           placeholder="Type a message..."
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={e => setInput(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && handleSend()}
         />
         <button className="btn btn-primary" onClick={handleSend}>
           Send

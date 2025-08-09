@@ -37,8 +37,7 @@ export const sendMessage = async (req, res) => {
     if (global.io) {
       global.io.emit('new-message', newMsg);
     }
-
-    // Simulate delivered after 2s
+    
     setTimeout(async () => {
       const updated = await Message.findByIdAndUpdate(
         newMsg._id,
@@ -50,7 +49,6 @@ export const sendMessage = async (req, res) => {
       }
     }, 2000);
 
-    // Simulate read after 4s
     setTimeout(async () => {
       const updated = await Message.findByIdAndUpdate(
         newMsg._id,
@@ -68,9 +66,6 @@ export const sendMessage = async (req, res) => {
     res.status(500).json({ error: 'Failed to send message' });
   }
 };
-
-
-
 
 export const processPayloads = async (req, res) => {
   try {

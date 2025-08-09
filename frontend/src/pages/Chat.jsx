@@ -1,64 +1,77 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import io from "socket.io-client";
+import { useState, useEffect } from 'react';
+import axios from 'axios';
+import { io } from 'socket.io-client';
 
-const socket = io(import.meta.env.VITE_API_URL || "http://localhost:3000");
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3000';
 
-export default function Chat() {
-  const { wa_id } = useParams();
+export default function Chat({ wa_id, name, onBack }) {
   const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState("");
-
-  const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:3000";
+  const [newMessage, setNewMessage] = useState('');
+  const socket = io(API_BASE);
 
   useEffect(() => {
-    axios
-      .get(`${API_BASE || "http://localhost:3000"}/api/messages/${wa_id}`)
-      .then((res) => setMessages(res.data));
+    axios.get(`${API_BASE}/api/messages/${wa_id}`)
+      .then(res => setMessages(res.data))
+      .catch(err => console.error(err));
 
-    socket.on("new-message", (msg) => {
-      if (msg.wa_id === wa_id) {
-        setMessages((prev) => [...prev, msg]);
+    socket.on('receiveMessage', (message) => {
+      if (message.wa_id === wa_id) {
+        setMessages((prev) => [...prev, message]);
       }
     });
 
-    return () => socket.off("new-message");
+    return () => socket.disconnect();
   }, [wa_id]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
-    const res = await axios.post(`${API_BASE || "http://localhost:3000"}/api/messages/send`, {
+  const handleSend = () => {
+    if (!newMessage.trim()) return;
+    axios.post(`${API_BASE}/api/messages/send`, {
       wa_id,
-      name: "You",
-      text: input,
-    });
-    setInput("");
+      text: newMessage,
+    })
+      .then((res) => {
+        setMessages((prev) => [...prev, res.data]);
+        setNewMessage('');
+      })
+      .catch(err => console.error(err));
   };
 
   return (
-    <div className="p-4 flex flex-col h-screen">
-      <h2 className="text-xl font-bold mb-2">Chat with {wa_id}</h2>
-      <div className="flex-1 overflow-y-auto space-y-2 mb-4">
+    <div className="flex flex-col h-full">
+      {/* Chat Header */}
+      <div className="flex items-center p-4 bg-base-300 border-b">
+        {/* Back button only on mobile */}
+        {onBack && (
+          <button
+            className="btn btn-sm btn-ghost mr-2 md:hidden"
+            onClick={onBack}
+          >
+            ←
+          </button>
+        )}
+        <h2 className="font-semibold">{name}</h2>
+      </div>
+
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-2">
         {messages.map((msg, idx) => (
           <div
             key={idx}
-            className={`chat ${msg.name === "You" ? "chat-end" : "chat-start"}`}
+            className={`chat ${msg.isSentByUser ? 'chat-end' : 'chat-start'}`}
           >
-            <div className="chat-header">{msg.name}</div>
             <div className="chat-bubble">{msg.text}</div>
-            <div className="chat-footer opacity-50 text-xs">
-              {msg.status} | {new Date(msg.timestamp).toLocaleString()}
-            </div>
           </div>
         ))}
       </div>
-      <div className="flex items-center gap-2">
+
+      {/* Input */}
+      <div className="p-4 border-t flex gap-2">
         <input
+          type="text"
           className="input input-bordered w-full"
-          placeholder="Type a message..."
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
+          placeholder="Type a message"
+          value={newMessage}
+          onChange={(e) => setNewMessage(e.target.value)}
         />
         <button className="btn btn-primary" onClick={handleSend}>
           Send
