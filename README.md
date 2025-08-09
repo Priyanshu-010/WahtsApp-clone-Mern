@@ -62,16 +62,15 @@ Includes **Webhook Payload Processing**, **Real-Time Updates**, and a **responsi
 ## 📂 Project Structure
 
 WhatsApp-clone-Mern/
-│
 ├── backend/
 │ ├── controllers/
-│ ├── payloads/
-│ ├── processPayloads.js
 │ ├── models/
+│ ├── payloads/
 │ ├── routes/
+│ ├── processPayloads.js
 │ ├── index.js
 │ ├── socket.js
-│ └── .env 
+│ └── .env
 │
 ├── frontend/
 │ ├── src/
@@ -79,7 +78,7 @@ WhatsApp-clone-Mern/
 │ │ ├── utils/
 │ │ ├── App.jsx
 │ │ └── Main.jsx
-│ └── .env 
+│ └── .env
 │
 └── README.md
 
